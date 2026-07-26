@@ -180,35 +180,15 @@
 }
 
 @media (max-width: 720px) {
-    .startPage {
-        align-items: start;
-        padding: 12px;
-    }
-
-    .startCard {
-        padding: 24px 18px;
-        border-radius: 18px;
-    }
-
-    .fileTable {
-        overflow-x: auto;
-    }
-
-    .fileTableHeader,
-    .fileTableList {
-        min-width: 680px;
-    }
-
-    .totalSection {
-        align-items: stretch;
-        flex-direction: column;
-    }
-
-    .calculateTotalButton {
-        width: 100%;
-    }
-
-    .totalLabel {
-        justify-content: space-between;
-    }
+    .startPage {align-items: start; padding: 10px;}
+    .startCard {width: 100%; padding: 22px 14px; border-radius: 16px;}
+    .startHeader {margin-bottom: 24px;}
+    .labelNamePage {font-size: clamp(1.7rem, 9vw, 2.3rem);}
+    .fileInputLabel, .restartButton, .calculateTotalButton, .buttonStartGame {width: 100%;}
+    .configurationToolbar {display: block;}
+    .fileTable {overflow: visible; border: none;}
+    .fileTableHeader {display: none;}
+    .fileTableList {min-width: 0; gap: 12px;}
+    .totalSection {align-items: stretch; flex-direction: column;}
+    .totalLabel {justify-content: space-between;}
 }
