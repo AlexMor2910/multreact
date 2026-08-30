@@ -6,7 +6,7 @@ import "./StartPage.css";
 
 export default function StartPage(props) {
     const navigate = useNavigate();
-    const {excelNames, setExcelNames, excelLength, setExcelLength, buttonState, setButtonState, inputValues, setInputValues} = props;
+    const {excelNames, setExcelNames, excelLength, setExcelLength, buttonState, setButtonState, swapState, setSwapState, inputValues, setInputValues} = props;
     const [total, setTotal] = useState(0);
     const [flagTotal, setFlagTotal] = useState(false);
 
@@ -32,13 +32,13 @@ export default function StartPage(props) {
         });
     }
 
-    function selectFromEachArray(files, buttonStates, inputNumber) {
+    function selectFromEachArray(files, buttonStates, inputNumber, swapStates) {
         const selections = [];
 
         files.forEach((rows, i) => {
             if (!buttonStates[i]) return;
 
-            const data = (rows || []).slice(1).map(row => row.slice(0, 2));
+            const data = (rows || []).slice(1).map(row => swapStates[i] ? [row[1], row[0]] : [row[0], row[1]]);
 
             if (data.length === 0) return;
 
@@ -96,6 +96,7 @@ export default function StartPage(props) {
         setExcelNames(loadedFiles.map(file => file.name));
         setExcelLength(loadedFiles.map(file => Math.max(file.rows.length - 1, 0)));
         setButtonState(Array(loadedFiles.length).fill(false));
+        setSwapState(Array(loadedFiles.length).fill(false));
         setInputValues(Array(loadedFiles.length).fill(0));
         setTotal(0);
         setFlagTotal(false);
@@ -123,6 +124,7 @@ export default function StartPage(props) {
 
     const buttonRestart = () => {
         setButtonState(Array(excelNames.length).fill(false));
+        setSwapState(Array(excelNames.length).fill(false));
         setInputValues(Array(excelNames.length).fill(0));
         setFlagTotal(false);
     };
@@ -136,7 +138,7 @@ export default function StartPage(props) {
         }
 
         try {
-            const selections = selectFromEachArray(props.excelFiles, buttonState, inputValues);
+            const selections = selectFromEachArray(props.excelFiles, buttonState, inputValues, swapState);
             props.setQuestions(selections);
             setTotal(selectedTotal);
             setFlagTotal(true);
@@ -152,7 +154,7 @@ export default function StartPage(props) {
                 <header className="startHeader">
                     <p className="startEyebrow">Question setup</p>
                     <h1 className="labelNamePage">Multiple Answers Exercises</h1>
-                    <p className="startDescription">Upload one or more Excel files, choose the files to include, and set the number of questions for your game.</p>
+                    <p className="startDescription">Upload one or more Excel files, choose the files to include, optionally swap questions and answers for each file, and set the number of questions for your game.</p>
                 </header>
 
                 <div className="filePickerSection">
@@ -173,10 +175,14 @@ export default function StartPage(props) {
                                 <span>Filename</span>
                                 <span>Questions</span>
                                 <span>Desired</span>
-                                <span>Include</span>
+                                <span>Select</span>
+                                <span>Inverted</span>
                             </div>
                             <ul className="fileTableList">
-                                <ScrollListFiles listNames={excelNames} length={excelLength} buttonState={buttonState} setButtonState={setButtonState} inputValues={inputValues} onInputChange={handleInputChange} />
+                                <ScrollListFiles listNames={excelNames} length={excelLength} buttonState={buttonState}
+                                                 setButtonState={setButtonState} swapState={swapState}
+                                                 setSwapState={setSwapState} inputValues={inputValues}
+                                                 onInputChange={handleInputChange}/>
                             </ul>
                         </div>
 

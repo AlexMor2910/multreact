@@ -1,6 +1,6 @@
 .fileRow {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 160px 170px 92px;
+    grid-template-columns: minmax(0, 1fr) 160px 170px 92px 92px;
     gap: 16px;
     align-items: center;
     min-height: 72px;
