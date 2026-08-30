@@ -10,34 +10,66 @@ export default function StartPage(props) {
     const [total, setTotal] = useState(0);
     const [flagTotal, setFlagTotal] = useState(false);
 
+    function addWrongAnswers(rows, difficulty = 3) {
+        if (rows.length <= difficulty) {
+            throw new Error(`Each selected Excel file needs at least ${difficulty + 1} questions.`);
+        }
+
+        const offsets = [];
+
+        while (offsets.length < difficulty) {
+            const offset = Math.floor(Math.random() * (rows.length - 1)) + 1;
+
+            if (!offsets.includes(offset)) {
+                offsets.push(offset);
+            }
+        }
+
+        return rows.map((row, index) => {
+            const wrongAnswers = offsets.map(offset => rows[(index + offset) % rows.length][1]);
+
+            return [row[0], row[1], ...wrongAnswers];
+        });
+    }
 
     function selectFromEachArray(files, buttonStates, inputNumber) {
         const selections = [];
 
         files.forEach((rows, i) => {
             if (!buttonStates[i]) return;
-            const data = (rows || []).slice(1);
+
+            const data = (rows || []).slice(1).map(row => row.slice(0, 2));
+
             if (data.length === 0) return;
+
+            const preparedData = addWrongAnswers(data, 3);
+
             const wantRaw = Number(inputNumber[i] ?? 0);
-            const want = wantRaw > 0 ? Math.min(wantRaw, data.length) : data.length;
+            const want = wantRaw > 0 ? Math.min(wantRaw, preparedData.length) : preparedData.length;
 
             let picked;
-            if (want === data.length) {
-                picked = data;
+
+            if (want === preparedData.length) {
+                picked = preparedData;
             } else {
-                const idx = Array.from({length: data.length}, (_, k) => k);
+                const idx = Array.from({length: preparedData.length}, (_, k) => k);
+
                 for (let j = idx.length - 1; j > 0; j--) {
                     const r = Math.floor(Math.random() * (j + 1));
                     [idx[j], idx[r]] = [idx[r], idx[j]];
                 }
-                picked = idx.slice(0, want).map(k => data[k]);
+
+                picked = idx.slice(0, want).map(k => preparedData[k]);
             }
+
             selections.push(...picked);
         });
+
         for (let i = selections.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [selections[i], selections[j]] = [selections[j], selections[i]];
         }
+
         return selections;
     }
 
@@ -97,14 +129,20 @@ export default function StartPage(props) {
 
     const startGame = () => {
         const selectedTotal = getSelectedTotal();
-        if (selectedTotal !== 0) {
+
+        if (selectedTotal === 0) {
+            alert("Please select at least one question.");
+            return;
+        }
+
+        try {
             const selections = selectFromEachArray(props.excelFiles, buttonState, inputValues);
             props.setQuestions(selections);
             setTotal(selectedTotal);
             setFlagTotal(true);
             navigate("/game");
-        } else {
-            alert("Please select at least one question.");
+        } catch (error) {
+            alert(error.message);
         }
     };
 
